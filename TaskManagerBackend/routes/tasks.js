@@ -1,16 +1,19 @@
 import express from "express";
 import {connectToDatabase} from '../db.js'
 import { ObjectId } from 'mongodb';
+import {authMiddleware, generateJWT, verifyJWT} from '../middleware/middleware.js'
+
 const router = express.Router();
 
 const db = await connectToDatabase();
 
 
 
-router.get('/', async(req, res)=>{
+router.get('/', [authMiddleware],async(req, res)=>{
+    let korisnik = req.authorised_user
     try{
         let tasksCollection = db.collection('tasks')
-        let tasks = await tasksCollection.find().toArray()
+        let tasks = await tasksCollection.find({userId: new ObjectId(korisnik)}).toArray()
         res.status(200).json(tasks)
     }
     catch(e){
