@@ -40,13 +40,20 @@ const goToRegister = () => {
 }
 
 onMounted(async()=>{
- let response = await axios.get('http://localhost:8000/tasks')
+
  try{
+  const token = localStorage.getItem("jwt_token"); 
+    if (!token) {
+      console.error("JWT token not found!");
+      return;
+    }
+  let response = await axios.get('http://localhost:8000/tasks',
+    {headers: {Authorization: `Bearer ${token}`}})
+  
   console.log(response)
   let podaci = response.data
   taskovi.value = podaci
-  }
-
+ }
  catch(e){
   console.error("Error", e)
  }

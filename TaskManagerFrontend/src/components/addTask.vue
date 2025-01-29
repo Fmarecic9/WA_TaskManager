@@ -77,7 +77,14 @@ const dodajZadatak= async()=> {
         opisZadatka.value = "";
         editing.value = false;
   try{
-    await axios.post('http://localhost:8000/tasks', noviTask)
+    const token = localStorage.getItem("jwt_token"); 
+    if (!token) {
+      console.error("JWT token not found!");
+      return;
+    }
+  
+    await axios.post('http://localhost:8000/tasks', noviTask,
+    {headers: {Authorization: `Bearer ${token}`}})
     alert("Dodan zadatak")
   }
   catch(e){

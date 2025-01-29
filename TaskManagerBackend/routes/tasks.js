@@ -12,8 +12,9 @@ const db = await connectToDatabase();
 router.get('/', [authMiddleware],async(req, res)=>{
     let korisnik = req.authorised_user
     try{
+        let userId = korisnik.id
         let tasksCollection = db.collection('tasks')
-        let tasks = await tasksCollection.find({userId: new ObjectId(korisnik)}).toArray()
+        let tasks = await tasksCollection.find({userId}).toArray()
         res.status(200).json(tasks)
     }
     catch(e){
@@ -21,10 +22,22 @@ router.get('/', [authMiddleware],async(req, res)=>{
     }
 })
 
-router.post('/', async(req,res)=>{
-   const task = req.body
+router.post('/',[authMiddleware], async(req,res)=>{
+    let korisnik = req.authorised_user
+    if(!korisnik){
+        return res.status(401).send("Nitko nije ulogiran")
+    }
+    const task = req.body
     try{
-        let result = await db.collection('tasks').insertOne(task)
+        const taskPlusUser = {
+            _id: new ObjectId,
+            naslov: task.naslov,
+            opis: task.opis,
+            zavrsen: task.zavrsen,
+            tag: task.tag,
+            userId: korisnik.id
+        }
+        let result = await db.collection('tasks').insertOne(taskPlusUser)
         res.status(200).json({insertedCount: result.insertedCount})
     }
     catch(e){

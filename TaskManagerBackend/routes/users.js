@@ -48,9 +48,9 @@ router.post('/login', async(req,res)=>{
         }
         const compareRez = await bcrypt.compare(password, trazeni.password)
         if (compareRez === false){
-            return res.status(400).json({msg:"lozinke se ne podudaraju"})
+            return res.status(401).json({msg:"lozinke se ne podudaraju"})
         }
-        let token = await generateJWT({username: trazeni.username})
+        let token = await generateJWT({id: trazeni._id, username: trazeni.username})
         return res.status(200).json({korisnik: trazeni.username, jwt: token})
     }
     catch(e){

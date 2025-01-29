@@ -36,7 +36,11 @@
 
 <script setup>
 import axios from 'axios'
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, resolveDirective} from 'vue'
+import {useRouter} from 'vue-router'
+
+
+const router = useRouter()
 
 let username = ref("")
 let password = ref("")
@@ -47,10 +51,17 @@ const loginKorisnika = async() =>{
       password: password.value
     } 
     try{
-      await axios.post('http://localhost:8000/users/login', user)
+      let response = await axios.post('http://localhost:8000/users/login', user)
+      if (response.data.jwt) {
+        localStorage.setItem("jwt_token", response.data.jwt); 
+        console.log("JWT Token stored:", response.data.jwt);
+      }else {
+        console.error("JWT token not received!");
+      }
         username.value = ""
         password.value = ""
-        alert('')
+        alert('Succesful login')
+        router.push('/home')
     }
     catch(e){
       console.error(`Nidobro ${e}`)

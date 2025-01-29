@@ -3,6 +3,7 @@ import {config} from 'dotenv'
 
 
 let jwt_secret = process.env.JWT_SECRET
+
 async function generateJWT(payload) {
     try {
     let token = jwt.sign(payload, jwt_secret); 
@@ -25,13 +26,13 @@ async function verifyJWT(token) {
 
 
 const authMiddleware = async (req, res, next) => {
-    let token = req.headers.authorization.split(' ')[1]
-    if(!token){
-        return res.status(400).send("Nema tokena")
+    if (!req.headers.authorization) {
+        return res.status(401).json({ msg: "Missing Authorization header" });
     }
+    let token = req.headers.authorization.split(' ')[1]
     try{
     let decoded = await verifyJWT(token); 
-    if (!decoded) {
+    if (!decoded||!decoded.id) {
     return res.status(401).send('Nevaljan JWT token!');
     }
     req.authorised_user = decoded; 

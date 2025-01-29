@@ -44,7 +44,10 @@
 <script setup>
 import axios from 'axios'
 import {ref, onMounted} from 'vue'
+import {useRouter} from 'vue-router'
 
+
+const router = useRouter()
 let username = ref("")
 let password = ref("")
 
@@ -59,6 +62,7 @@ const dodajKorisnika = async() =>{
       username.value=""
       password.value=""
       alert("Success")
+      router.push('/home')
     }
     catch(e){
       console.error(`Nidobro ${e}`)
